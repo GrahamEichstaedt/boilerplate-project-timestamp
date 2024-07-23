@@ -25,6 +25,18 @@ app.get("/api/hello", function (req, res) {
 });
 
 
+app.get("/api/:date?", function(req, res) {
+  const dateParam = req.params;
+  // console.log(`Date Received from URL: ${dateParam.toString()}`);
+  // for(let prop in dateParam) {
+  //   console.log(`Prop: ${prop}, dataParam[${prop}]: ${dateParam[prop]}`)
+  // }
+  const dateObj = new Date(dateParam.date);
+  // console.log(`Date Obj: ${dateObj.toString()}`);
+  res.json({unix: dateObj.getTime(), utc: dateObj.toUTCString()});
+})
+
+
 
 // Listen on port set in environment variable or default to 3000
 var listener = app.listen(process.env.PORT || 3000, function () {
