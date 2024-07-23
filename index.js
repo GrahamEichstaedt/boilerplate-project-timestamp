@@ -24,32 +24,34 @@ app.get("/api/hello", function (req, res) {
   res.json({greeting: 'hello API'});
 });
 
-
 app.get("/api/:date?", function(req, res) {
   let dateParam = req.params.date;
-  console.log(`dateParam: ${dateParam}`)
-  console.log(!dateParam);
-  const now = new Date();
-  if(!dateParam) {
-    console.log("if")
+
+  if (!dateParam) {
     dateParam = new Date();
-    console.log(`New Date: ${dateParam}`)
-  }
-  else {
-    console.log("else")
-    dateParam = new Date(dateParam);
-    console.log(`New Date: ${dateParam}`)
+  } else if (/^\d+$/.test(dateParam)) {
+    // Force numeric input as a number
+    dateParam = new Date(parseInt(dateParam));
+  } else {
+    // Try parsing as a date string, but handle errors
+    try {
+      dateParam = new Date(dateParam);
+    } catch (error) {
+      res.json({ error: "Invalid Date" });
+      return; // Stop processing the request if an error occurs
+    }
   }
 
-  if(isNaN(dateParam)) {
-    console.log("Invalid date");
-    res.json({error: "Invalid Date"});
+  if (isNaN(dateParam)) {
+    res.json({ error: "Invalid Date" });
+  } else {
+    res.json({
+      unix: dateParam.getTime(),
+      utc: dateParam.toUTCString()
+    });
   }
-  else {
-    console.log(`{unix: ${dateParam.getTime()}, utc: ${dateParam.toUTCString()}}`)
-    res.json({ unix: dateParam.getTime(), utc: dateParam.toUTCString()})
-  }
-})
+});
+
 
 // Listen on port set in environment variable or default to 3000
 var listener = app.listen(process.env.PORT || 3000, function () {
